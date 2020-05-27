@@ -5,6 +5,9 @@ import '../../Database/database.dart';
 import '../../Model/Contato.dart';
 import './Widgets/Card.dart';
 import '../Contato/PageContato.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+enum OrderOptions {orderaz, orderza}
 
 class Home extends StatefulWidget {
   @override
@@ -14,7 +17,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   ContactHelper ContatoDB = ContactHelper();
-
   List<Contato> Contatos = List();
 
 
@@ -22,16 +24,30 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     _ListarContatos();
-
   }
-
-
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
+        actions: <Widget>[
+          PopupMenuButton<OrderOptions>(
+            itemBuilder: (context){
+              return <PopupMenuEntry<OrderOptions>>[
+                const PopupMenuItem(
+                    child: Text("Ordernar de A-Z"),
+                    value: OrderOptions.orderaz
+                ),
+                const PopupMenuItem(
+                    child: Text("Ordernar de Z-A"),
+                    value: OrderOptions.orderza
+                )
+              ];
+            },
+            onSelected: _OrderList,
+          )
+        ],
         title: Text("Contatos"),
         centerTitle: true,
         backgroundColor: Colors.red,
@@ -76,36 +92,51 @@ class _HomeState extends State<Home> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    FlatButton(
-                      onPressed: (){
-
-                      },
-                      child: Text("Ligar",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 20
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                      child: FlatButton(
+                        onPressed: (){
+                          launch("tel: ${Contatos[index].phone}");
+                          Navigator.pop(context);
+                        },
+                        child: Text("Ligar",
+                          style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 20
+                          ),
                         ),
                       ),
                     ),
-                    FlatButton(
-                      onPressed: (){
-
-                      },
-                      child: Text("Editar",
-                        style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 20
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                      child: FlatButton(
+                        onPressed: (){
+                          Navigator.pop(context);
+                          _showContatoPage(contato: Contatos[index]);
+                        },
+                        child: Text("Editar",
+                          style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 20
+                          ),
                         ),
                       ),
                     ),
-                    FlatButton(
-                      onPressed: (){
-
-                      },
-                      child: Text("Excluir",
-                        style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 20
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                      child: FlatButton(
+                        onPressed: (){
+                          ContatoDB.deleteContato(Contatos[index].id);
+                          setState(() {
+                            Contatos.removeAt(index);
+                            Navigator.pop(context);
+                          });
+                        },
+                        child: Text("Excluir",
+                          style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 20
+                          ),
                         ),
                       ),
                     )
@@ -136,6 +167,24 @@ class _HomeState extends State<Home> {
       setState(() {
         Contatos = list;
       });
+    });
+  }
+
+  void _OrderList(OrderOptions result){
+    switch(result){
+      case OrderOptions.orderaz:
+        Contatos.sort((a, b){
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        });
+        break;
+      case OrderOptions.orderza:
+        Contatos.sort((a, b){
+          return b.name.toLowerCase().compareTo(a.name.toLowerCase());
+        });
+        break;
+    }
+    setState(() {
+
     });
   }
 }

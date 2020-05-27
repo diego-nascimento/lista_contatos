@@ -15,6 +15,7 @@ Widget ContatoCard(int index, List Contatos){
             decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 image: DecorationImage(
+                    fit:BoxFit.cover,
                     image: Contatos[index].img != null
                         ?FileImage(File(Contatos[index].img)):
                     AssetImage("images/images.png")

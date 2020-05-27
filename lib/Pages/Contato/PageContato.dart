@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:listadecontatos/Model/Contato.dart';
+import 'package:image_picker/image_picker.dart';
 
 class PageContato extends StatefulWidget {
 
@@ -66,6 +67,17 @@ class _PageContatoState extends State<PageContato> {
             child: Column(
               children: <Widget>[
                 GestureDetector(
+                  onTap: (){
+                    ImagePicker.pickImage(source: ImageSource.gallery).then((file){
+                      if(file == null){
+                        return;
+                      }else{
+                        setState(() {
+                          _editedContato.img = file.path;
+                        });
+                      }
+                    });
+                  },
                   child: Container(
                     width: 140,
                     height: 140,
